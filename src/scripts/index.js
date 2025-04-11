@@ -1,6 +1,6 @@
 import '../pages/index.css';
 import { initialCards, createCard, deleteCard, likeCard } from './cards.js';
-import { openModal, closeModal } from './modal.js';
+import { openModal, closeModal, waitForEventToClose } from './modal.js';
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
 // @todo: DOM узлы
@@ -47,20 +47,16 @@ function pasteCards(array) {
   });
 }
 
-// @todo: Вывести карточки на страницу
-
-pasteCards(initialCards);
-
 //------------------фунция просмотра фото-------------------
 
 function viewImage(sorce, name) {
   img.setAttribute('src', sorce);
   text.textContent = name;
   openModal(popupImage);
-  waitForEventToClose(popupImage);
 }
 
 //----------функции событий окрытия карточек------------
+
 function waitForEventToOpenEditForm(popup, button) {
   button.addEventListener('click', function () {
     openModal(popup);
@@ -75,25 +71,6 @@ function waitForEventToOpenAddForm(popup, button) {
   });
 }
 
-//---------функции событий закрытия карточек------------
-function waitForEventToClose(popup) {
-  popup.addEventListener('click', function (evt) {
-    if (
-      evt.target.classList.contains('popup__close') ||
-      evt.target.classList.contains('popup')
-    ) {
-      closeModal(evt.currentTarget);
-    }
-  });
-}
-
-export function closePopupWithEsc(evt) {
-  if (evt.key === 'Escape') {
-    const currentPopup = document.querySelector('.popup_is-opened');
-    closeModal(currentPopup);
-  }
-}
-
 //----------обработчик редактирования профиля------------
 
 function handleFormSubmit(evt) {
@@ -102,20 +79,6 @@ function handleFormSubmit(evt) {
   currentProfileDescription.textContent = jobInput.value;
   closeModal(popupEdit);
 }
-
-//----------слушатель редактирования профиля------------
-
-formElement.addEventListener('submit', handleFormSubmit);
-
-//----------редактирование профиля------------
-
-waitForEventToOpenEditForm(popupEdit, editButton);
-waitForEventToClose(popupEdit);
-
-//----------добaвление карточки------------
-
-waitForEventToOpenAddForm(popupNewCard, addButton);
-waitForEventToClose(popupNewCard);
 
 //----------обработчик добавления карточки------------
 
@@ -126,6 +89,22 @@ function addNewCard(evt) {
   placesList.prepend(clonedNewElement);
   closeModal(popupNewCard);
 }
+
+// @todo: Вывести карточки на страницу
+
+pasteCards(initialCards);
+
+//----------слушатель редактирования профиля------------
+
+formElement.addEventListener('submit', handleFormSubmit);
+
+//----------редактирование профиля------------
+
+waitForEventToOpenEditForm(popupEdit, editButton);
+
+//----------добaвление карточки------------
+
+waitForEventToOpenAddForm(popupNewCard, addButton);
 
 //----------слушатель добавления карточки------------
 
