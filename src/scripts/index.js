@@ -1,10 +1,11 @@
 import '../pages/index.css';
-import { initialCards, createCard, deleteCard, likeCard } from './cards.js';
-import { openModal, closeModal, waitForEventToClose } from './modal.js';
+import { initialCards } from './cards.js';
+import { createCard, deleteCard, likeCard } from './card.js';
+import { openModal, closeModal } from './modal.js';
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
 // @todo: DOM узлы
-export const cardElement = cardTemplate.querySelector('.places__item');
+const cardElement = cardTemplate.querySelector('.places__item');
 const body = document.querySelector('.page');
 const pageContent = body.querySelector('.page__content');
 // профиль
@@ -24,15 +25,17 @@ const editButton = profileInfo.querySelector('.profile__edit-button');
 // окно редактирования профиля
 const popupEdit = body.querySelector('.popup_type_edit');
 // Находим форму редактирования профиля  в DOM
-const formElement = document.forms['edit-profile'];
+const formEditProfile = document.forms['edit-profile'];
 // Находим поля формы редактирования профиля в DOM
-const nameInput = formElement.querySelector('.popup__input_type_name');
-const jobInput = formElement.querySelector('.popup__input_type_description');
+const nameInput = formEditProfile.querySelector('.popup__input_type_name');
+const jobInput = formEditProfile.querySelector(
+  '.popup__input_type_description'
+);
 // Находим форму добавления карточки в DOM
-export const formAddNewCard = document.forms['new-place'];
+const formAddNewCard = document.forms['new-place'];
 // Находим поля формы добавления карточки в DOM
-export const placeNameInput = formAddNewCard.elements['place-name'];
-export const urlInput = formAddNewCard.elements.link;
+const placeNameInput = formAddNewCard.elements['place-name'];
+const urlInput = formAddNewCard.elements.link;
 // кнопка вызова формы добавления карточки
 const addButton = pageContent.querySelector('.profile__add-button');
 // форма добавления карточки
@@ -42,7 +45,13 @@ const popupNewCard = body.querySelector('.popup_type_new-card');
 
 function pasteCards(array) {
   array.forEach((item) => {
-    const readyElement = createCard(item, deleteCard, viewImage, likeCard);
+    const readyElement = createCard(
+      item,
+      cardElement,
+      deleteCard,
+      viewImage,
+      likeCard
+    );
     placesList.append(readyElement);
   });
 }
@@ -51,6 +60,7 @@ function pasteCards(array) {
 
 function viewImage(sorce, name) {
   img.setAttribute('src', sorce);
+  img.setAttribute('alt', name);
   text.textContent = name;
   openModal(popupImage);
 }
@@ -73,7 +83,7 @@ function waitForEventToOpenAddForm(popup, button) {
 
 //----------обработчик редактирования профиля------------
 
-function handleFormSubmit(evt) {
+function handleEditFormSubmit(evt) {
   evt.preventDefault();
   currentProfileName.textContent = nameInput.value;
   currentProfileDescription.textContent = jobInput.value;
@@ -85,9 +95,16 @@ function handleFormSubmit(evt) {
 function addNewCard(evt) {
   evt.preventDefault();
   const newCard = { name: [placeNameInput.value], link: [urlInput.value] };
-  const clonedNewElement = createCard(newCard, deleteCard, viewImage, likeCard);
+  const clonedNewElement = createCard(
+    newCard,
+    cardElement,
+    deleteCard,
+    viewImage,
+    likeCard
+  );
   placesList.prepend(clonedNewElement);
   closeModal(popupNewCard);
+  formAddNewCard.reset();
 }
 
 // @todo: Вывести карточки на страницу
@@ -96,7 +113,7 @@ pasteCards(initialCards);
 
 //----------слушатель редактирования профиля------------
 
-formElement.addEventListener('submit', handleFormSubmit);
+formEditProfile.addEventListener('submit', handleEditFormSubmit);
 
 //----------редактирование профиля------------
 
@@ -108,4 +125,4 @@ waitForEventToOpenAddForm(popupNewCard, addButton);
 
 //----------слушатель добавления карточки------------
 
-popupNewCard.addEventListener('submit', addNewCard);
+formAddNewCard.addEventListener('submit', addNewCard);
