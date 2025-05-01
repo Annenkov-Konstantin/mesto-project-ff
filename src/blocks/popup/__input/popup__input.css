@@ -7,11 +7,30 @@
   line-height: 18px;
   box-sizing: border-box;
   padding: 10px 0 0;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .popup__input:last-of-type {
-  margin-bottom: 0;
+  margin-top: 5px;
+}
+
+/* Поле с ошибкой */
+.form__input_not_valid {
+  border-bottom: 1px solid #ff0000;
+  outline: none;
+}
+
+/* Сообщение об ошибке */
+.form__input_type-error {
+  color: #ff0000;
+  font-size: 12px;
+  display: block;
+  visibility: hidden; /* по умолчанию скрыто */
+}
+
+/* Видимое сообщение об ошибке */
+.form__input_error_visible {
+  visibility: visible;
 }
 
 @media screen and (max-width: 568px) {

@@ -1,5 +1,5 @@
 export function createCard(
-  item,
+  object,
   cardElement,
   deleteCardFunction,
   showImageFunction,
@@ -7,14 +7,14 @@ export function createCard(
 ) {
   const clonedElement = cardElement.cloneNode(true);
   const cardImage = clonedElement.querySelector('.card__image');
-  cardImage.src = item.link;
-  cardImage.alt = item.name;
+  cardImage.src = object.link;
+  cardImage.alt = object.name;
   cardImage.addEventListener('click', function () {
-    showImageFunction(item.link, item.name);
+    showImageFunction(object.link, object.name);
   });
   const likeButton = clonedElement.querySelector('.card__like-button');
   likeButton.addEventListener('click', likeFunction);
-  clonedElement.querySelector('.card__title').textContent = item.name;
+  clonedElement.querySelector('.card__title').textContent = object.name;
   clonedElement
     .querySelector('.card__delete-button')
     .addEventListener('click', deleteCardFunction);
