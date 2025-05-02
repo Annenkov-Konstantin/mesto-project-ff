@@ -1,6 +1,6 @@
 import '../pages/index.css';
 //import { initialCards } from './cards.js';
-import { createCard, deleteCard, likeCard } from './card.js';
+import { createCard } from './card.js';
 import { openModal, closeModal } from './modal.js';
 import {
   clearValidationErrors,
@@ -11,6 +11,7 @@ import {
   initialRequests,
   editMyProfileRequest,
   addNewCardRequest,
+  changeMyAvatarRequest,
 } from './api.js';
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
@@ -56,6 +57,7 @@ const addButton = pageContent.querySelector('.profile__add-button');
 const popupNewCard = body.querySelector('.popup_type_new-card');
 // массив со списком форм
 const formList = [formEditProfile, formAddNewCard];
+// объект-конфиг
 const formElementsClasses = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
@@ -65,6 +67,9 @@ const formElementsClasses = {
   errorClass: 'form__input_error_visible', // видимость сообщения
   inputError: 'form__input_type-error', // стиль сообщения
 };
+
+// объект c id.user-------------
+const userId = { _id: '154268c6f33db0778f9e0eae' };
 
 //------------------функция вывода моих данных------------------------
 
@@ -78,13 +83,7 @@ function showInformationAboutMe(object) {
 
 function pasteCards(array) {
   array.forEach((object) => {
-    const readyElement = createCard(
-      object,
-      cardElement,
-      deleteCard,
-      viewImage,
-      likeCard
-    );
+    const readyElement = createCard(object, cardElement, viewImage, userId._id);
     placesList.append(readyElement);
   });
 }
@@ -162,13 +161,11 @@ function addNewCard(evt) {
   evt.preventDefault();
   addNewCardRequest(placeNameInput.value, urlInput.value)
     .then((object) => {
-      const newCard = { name: object.name, link: object.link };
       const clonedNewElement = createCard(
-        newCard,
+        object,
         cardElement,
-        deleteCard,
         viewImage,
-        likeCard
+        userId._id
       );
       placesList.prepend(clonedNewElement);
       closeModal(popupNewCard);
@@ -212,5 +209,3 @@ formAddNewCard.addEventListener('submit', addNewCard);
 //----------Валидация------------
 
 enableValidation(formElementsClasses, formList);
-
-//----------Запросы------------

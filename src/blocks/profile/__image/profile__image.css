@@ -1,4 +1,7 @@
 .profile__image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 120px;
   height: 120px;
   -webkit-border-radius: 50%;
@@ -20,3 +23,5 @@
     margin-right: 0;
   }
 }
+
+
