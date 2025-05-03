@@ -1,2 +1,1 @@
-https://github.com/Annenkov-Konstantin/mesto-project-ff
-
+https://annenkov-konstantin.github.io/mesto-project-ff/

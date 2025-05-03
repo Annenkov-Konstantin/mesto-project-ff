@@ -8,6 +8,7 @@
 @import url('./__caption/popup__caption.css');
 @import url('./__image/popup__image.css');
 @import url('./__ask_to_delete/popup__ask_to_delete.css');
+@import url('./__change-avatar/popup__change_avatar.css');
 
 .popup {
   font-family: 'Inter', Arial, sans-serif;

@@ -54,6 +54,7 @@ function askBeforeDeleteCard(evt) {
   const card = deleteButton.closest('.card');
   openModal(popUpAskBeforeDeleteCard);
   confirmButton.addEventListener('click', function deleteCard() {
+    confirmButton.setAttribute('disabled', true);
     deleteCardRequest(card._id)
       .then(() => {
         card.remove();
@@ -62,6 +63,9 @@ function askBeforeDeleteCard(evt) {
       .catch((error) => {
         console.error(error); // Логируем ошибку
         alert('Не удалось удалить карточку. Попробуйте снова.');
+      })
+      .finally(() => {
+        confirmButton.removeAttribute('disabled');
       });
   });
 }

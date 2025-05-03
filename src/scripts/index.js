@@ -1,5 +1,4 @@
 import '../pages/index.css';
-//import { initialCards } from './cards.js';
 import { createCard } from './card.js';
 import { openModal, closeModal } from './modal.js';
 import {
@@ -55,8 +54,18 @@ const urlInput = formAddNewCard.elements.link;
 const addButton = pageContent.querySelector('.profile__add-button');
 // попап добавления карточки
 const popupNewCard = body.querySelector('.popup_type_new-card');
+// кнопка вызова изменения аватара
+const editAvatarButton = pageContent.querySelector(
+  '.profile__edit-avatar-button'
+);
+// попап изменения аватара
+const popupChangeAvatar = body.querySelector('.popup_type_change-avatar');
+// Находим форму изменения аватара в DOM
+const formEditAvatar = document.forms['new-avatar'];
+// Находим полe формы добавления карточки в DOM
+const avatarInput = formEditAvatar.elements.avatar;
 // массив со списком форм
-const formList = [formEditProfile, formAddNewCard];
+const formList = [formEditProfile, formAddNewCard, formEditAvatar];
 // объект-конфиг
 const formElementsClasses = {
   formSelector: '.popup__form',
@@ -74,7 +83,7 @@ const userId = { _id: '154268c6f33db0778f9e0eae' };
 //------------------функция вывода моих данных------------------------
 
 function showInformationAboutMe(object) {
-  profileAvatar.style.setProperty('background-image', object.avatar);
+  profileAvatar.style.setProperty('background-image', `url(${object.avatar})`);
   currentProfileName.textContent = object.name;
   currentProfileDescription.textContent = object.about;
 }
@@ -137,10 +146,40 @@ function waitForEventToOpenAddForm(popup, button) {
   });
 }
 
+//----------функция события окрытия попапа для изменения аватара------------
+
+function waitForEventToOpenEditAvatar(popup, button) {
+  button.addEventListener('click', function () {
+    if (!formEditAvatar.checkValidity()) {
+      const form = clearValidationErrors(formEditAvatar, formElementsClasses);
+      // Обновляем состояние кнопки для новой формы
+      const inputList = Array.from(form.querySelectorAll('.popup__input'));
+      const buttonElement = form.querySelector('.popup__button');
+      toggleButtonState(inputList, buttonElement);
+    }
+    openModal(popup);
+  });
+}
+
+//функции изменения текста кнопки при отправке запроса
+
+function changeTextSubmitButton(button, newText) {
+  const currentButton = button;
+  currentButton.setAttribute('disabled', true);
+  currentButton.textContent = newText;
+}
+
+function returnInitialTextSubmitButton(button, initialText) {
+  const currentButton = button;
+  currentButton.removeAttribute('disabled');
+  currentButton.textContent = initialText;
+}
+
 //----------обработчик редактирования профиля------------
 
 function handleEditFormSubmit(evt) {
-  evt.preventDefault();
+  evt.preventDefault(evt.target);
+  changeTextSubmitButton(evt.target.lastElementChild, 'Сохранение...');
   editMyProfileRequest(nameInput.value, jobInput.value)
     .then((object) => {
       // Обновляем данные на странице из ответа сервера
@@ -152,6 +191,9 @@ function handleEditFormSubmit(evt) {
     .catch((error) => {
       console.error(error); // Логируем ошибку
       alert('Не удалось обновить данные профиля. Попробуйте снова.');
+    })
+    .finally(() => {
+      returnInitialTextSubmitButton(evt.target.lastElementChild, 'Сохранить');
     });
 }
 
@@ -159,6 +201,7 @@ function handleEditFormSubmit(evt) {
 
 function addNewCard(evt) {
   evt.preventDefault();
+  changeTextSubmitButton(evt.target.lastElementChild, 'Сохранение...');
   addNewCardRequest(placeNameInput.value, urlInput.value)
     .then((object) => {
       const clonedNewElement = createCard(
@@ -174,6 +217,9 @@ function addNewCard(evt) {
     .catch((error) => {
       console.error(error);
       alert('Не удалось добавить карточку. Попробуйте снова.');
+    })
+    .finally(() => {
+      returnInitialTextSubmitButton(evt.target.lastElementChild, 'Сохранить');
     });
 }
 
@@ -190,6 +236,29 @@ Promise.all(initialRequests)
     console.error('Ошибка при выполнении запросов:', error);
   });
 
+//----------обработчик изменения аватара------------
+
+function editAvatar(evt) {
+  evt.preventDefault();
+  changeTextSubmitButton(evt.target.lastElementChild, 'Сохранение...');
+  changeMyAvatarRequest(avatarInput.value)
+    .then((object) => {
+      profileAvatar.style.setProperty(
+        'background-image',
+        `url(${object.avatar})`
+      );
+      closeModal(popupChangeAvatar);
+      formEditAvatar.reset();
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Не удалось изменить аватар. Попробуйте снова.');
+    })
+    .finally(() => {
+      returnInitialTextSubmitButton(evt.target.lastElementChild, 'Сохранить');
+    });
+}
+
 //----------слушатель редактирования профиля------------
 
 formEditProfile.addEventListener('submit', handleEditFormSubmit);
@@ -205,6 +274,14 @@ waitForEventToOpenAddForm(popupNewCard, addButton);
 //----------слушатель добавления карточки------------
 
 formAddNewCard.addEventListener('submit', addNewCard);
+
+//----------изменение аватара------------
+
+waitForEventToOpenEditAvatar(popupChangeAvatar, editAvatarButton);
+
+//----------слушатель изменение аватара------------
+
+formEditAvatar.addEventListener('submit', editAvatar);
 
 //----------Валидация------------
 

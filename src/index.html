@@ -29,7 +29,8 @@
           require('./images/avatar.jpg')%>');
             "
           >
-          <button type="button" class="profile__edit-avatar-button"></button></div>
+            <button type="button" class="profile__edit-avatar-button"></button>
+          </div>
           <div class="profile__info">
             <h1 class="profile__title">Жак-Ив Кусто</h1>
             <button class="profile__edit-button" type="button"></button>
@@ -139,16 +140,18 @@
         </button>
       </div>
     </div>
-    <div class="popup popup_type_change-avatar popup_is-animated">
-      <div class="popup__content">
+    <div
+      class="popup popup_type_change-avatar popup_is-animated"
+    >
+      <div class="popup__content_change-avatar">
         <button type="button" class="popup__close"></button>
         <h3 class="popup__title">Обновить аватар</h3>
-        <form class="popup__form" name="new-avatar" novalidate>
+        <form class="popup__form" name="new-avatar">
           <input
             type="url"
             name="avatar"
-            class="popup__input popup__input_type_url"
-            id="popup__input_type_new-avatar_url"
+            class="popup__input popup__input_type__new-avatar_url"
+            id="popup__input_type__new-avatar_url"
             placeholder="Ссылка на картинку"
             required
           />
