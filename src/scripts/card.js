@@ -75,6 +75,7 @@ function likeCard(evt) {
   const likeButton = evt.target;
   const likeContainer = likeButton.parentElement;
   const card = likeContainer.closest('.card');
+  /*(!likeButton.classList.contains('card__like-button_is-active')) ? like(card.id) : dislike(card.id)*/
   if (!likeButton.classList.contains('card__like-button_is-active')) {
     likeCardRequest(card._id)
       .then((object) => {

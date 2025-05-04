@@ -30,7 +30,7 @@ const currentProfileDescription = profileInfo.querySelector(
 const placesList = document.querySelector('.places__list');
 // окно просмотра фото
 const popupImage = document.querySelector('.popup_type_image');
-const img = popupImage.querySelector('.popup__image');
+const viewingImg = popupImage.querySelector('.popup__image');
 const text = popupImage.querySelector('.popup__caption');
 // кнопка вызова формы  редактирования профиля
 const editButton = profileInfo.querySelector('.profile__edit-button');
@@ -45,11 +45,22 @@ const nameInput = formEditProfile.querySelector('.popup__input_type_name');
 const jobInput = formEditProfile.querySelector(
   '.popup__input_type_description'
 );
+// Создаём массив полей формы редактирования профиля в DOM
+const formEditProfileInputList = Array.from(
+  formEditProfile.querySelectorAll('.popup__input')
+);
 // Находим форму добавления карточки в DOM
 const formAddNewCard = document.forms['new-place'];
 // Находим поля формы добавления карточки в DOM
 const placeNameInput = formAddNewCard.elements['place-name'];
 const urlInput = formAddNewCard.elements.link;
+// Создаём массив полей формы добавления карточки
+const formAddNewCardInputList = Array.from(
+  formAddNewCard.querySelectorAll('.popup__input')
+);
+// кнопка-submit формы добавления карточки
+const formAddNewCardButtonElement =
+  formAddNewCard.querySelector('.popup__button');
 // кнопка вызова формы добавления карточки
 const addButton = pageContent.querySelector('.profile__add-button');
 // попап добавления карточки
@@ -64,10 +75,17 @@ const popupChangeAvatar = body.querySelector('.popup_type_change-avatar');
 const formEditAvatar = document.forms['new-avatar'];
 // Находим полe формы добавления карточки в DOM
 const avatarInput = formEditAvatar.elements.avatar;
-// массив со списком форм
+// Создаём массив  с полем формы изменения аватара
+const formEditAvatarInputList = Array.from(
+  formEditAvatar.querySelectorAll('.popup__input')
+);
+// кнопка-submit формы изменения аватара
+const formEditAvatarButtonElement =
+  formEditAvatar.querySelector('.popup__button');
+// массив со списком имеющихся форм
 const formList = [formEditProfile, formAddNewCard, formEditAvatar];
 // объект-конфиг
-const formElementsClasses = {
+export const formElementsClasses = {
   formSelector: '.popup__form',
   inputSelector: '.popup__input',
   submitButtonSelector: '.popup__button',
@@ -78,7 +96,7 @@ const formElementsClasses = {
 };
 
 // объект c id.user-------------
-const userId = { _id: '154268c6f33db0778f9e0eae' };
+const userId = { _id: '' };
 
 //------------------функция вывода моих данных------------------------
 
@@ -100,8 +118,8 @@ function pasteCards(array) {
 //------------------фунция просмотра фото-------------------
 
 function viewImage(sorce, name) {
-  img.setAttribute('src', sorce);
-  img.setAttribute('alt', name);
+  viewingImg.setAttribute('src', sorce);
+  viewingImg.setAttribute('alt', name);
   text.textContent = name;
   openModal(popupImage);
 }
@@ -121,10 +139,9 @@ function waitForEventToOpenEditForm(popup, button) {
       jobInput.value = currentProfileDescription.textContent;
 
       // 3. Запускаем проверку валидности
-      const inputList = Array.from(
-        formEditProfile.querySelectorAll('.popup__input')
+      formEditProfileInputList.forEach((input) =>
+        input.dispatchEvent(new Event('input'))
       );
-      inputList.forEach((input) => input.dispatchEvent(new Event('input')));
     }
     // 4. Открываем попап
     openModal(popup);
@@ -136,11 +153,13 @@ function waitForEventToOpenEditForm(popup, button) {
 function waitForEventToOpenAddForm(popup, button) {
   button.addEventListener('click', function () {
     if (!formAddNewCard.checkValidity()) {
-      const form = clearValidationErrors(formAddNewCard, formElementsClasses);
+      clearValidationErrors(formAddNewCard, formElementsClasses);
       // Обновляем состояние кнопки для новой формы
-      const inputList = Array.from(form.querySelectorAll('.popup__input'));
-      const buttonElement = form.querySelector('.popup__button');
-      toggleButtonState(inputList, buttonElement);
+      toggleButtonState(
+        formAddNewCardInputList,
+        formElementsClasses,
+        formAddNewCardButtonElement
+      );
     }
     openModal(popup);
   });
@@ -151,11 +170,13 @@ function waitForEventToOpenAddForm(popup, button) {
 function waitForEventToOpenEditAvatar(popup, button) {
   button.addEventListener('click', function () {
     if (!formEditAvatar.checkValidity()) {
-      const form = clearValidationErrors(formEditAvatar, formElementsClasses);
+      clearValidationErrors(formEditAvatar, formElementsClasses);
       // Обновляем состояние кнопки для новой формы
-      const inputList = Array.from(form.querySelectorAll('.popup__input'));
-      const buttonElement = form.querySelector('.popup__button');
-      toggleButtonState(inputList, buttonElement);
+      toggleButtonState(
+        formEditAvatarInputList,
+        formElementsClasses,
+        formEditAvatarButtonElement
+      );
     }
     openModal(popup);
   });
@@ -223,19 +244,6 @@ function addNewCard(evt) {
     });
 }
 
-//----------вывод карточек и инф.профайла после удачного запроса------------
-
-Promise.all(initialRequests)
-  .then(([cards, userInfo]) => {
-    // Обрабатываем результат первого промиса (карточки)
-    pasteCards(cards);
-    // Обрабатываем результат второго промиса (информация о пользователе)
-    showInformationAboutMe(userInfo);
-  })
-  .catch((error) => {
-    console.error('Ошибка при выполнении запросов:', error);
-  });
-
 //----------обработчик изменения аватара------------
 
 function editAvatar(evt) {
@@ -258,6 +266,21 @@ function editAvatar(evt) {
       returnInitialTextSubmitButton(evt.target.lastElementChild, 'Сохранить');
     });
 }
+
+//----------вывод карточек и инф.профайла после удачного запроса------------
+
+Promise.all(initialRequests)
+  .then(([cards, userInfo]) => {
+    // сохранение _id пользователя в объект
+    userId._id = userInfo._id;
+    // Обрабатываем результат второго промиса (информация о пользователе)
+    showInformationAboutMe(userInfo);
+    // Обрабатываем результат первого промиса (карточки)
+    pasteCards(cards);
+  })
+  .catch((error) => {
+    console.error('Ошибка при выполнении запросов:', error);
+  });
 
 //----------слушатель редактирования профиля------------
 
