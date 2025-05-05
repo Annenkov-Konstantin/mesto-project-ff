@@ -1,19 +1,14 @@
-import {
-  deleteCardRequest,
-  likeCardRequest,
-  disLikeCardRequest,
-} from './api.js';
-import { openModal, closeModal } from './modal.js';
-// попап подтверждения удаления
-const popUpAskBeforeDeleteCard = document.querySelector(
-  '.popup_type_ask_before_delete_card'
-);
-// кнопка попапа подтверждения удаления
-const confirmButton = popUpAskBeforeDeleteCard.querySelector(
-  '.popup__button-delete'
-);
+//-----------фунция создания карточки--------------
 
-export function createCard(object, cardElement, showImageFunction, userId) {
+export function createCard(
+  object,
+  cardElement,
+  showImageFunction,
+  userId,
+  askBeforeDeleteCard,
+  likeCardRequest,
+  disLikeCardRequest
+) {
   const clonedElement = cardElement.cloneNode(true);
   clonedElement._id = object._id;
   const cardImage = clonedElement.querySelector('.card__image');
@@ -31,11 +26,15 @@ export function createCard(object, cardElement, showImageFunction, userId) {
   ) {
     likeButton.classList.add('card__like-button_is-active');
   }
-  likeButton.addEventListener('click', likeCard);
+  likeButton.addEventListener('click', (evt) =>
+    likeCard(evt, likeCardRequest, disLikeCardRequest)
+  );
   clonedElement.querySelector('.card__title').textContent = object.name;
   const deleteButton = clonedElement.querySelector('.card__delete-button');
   if (object.owner._id === userId) {
-    deleteButton.addEventListener('click', askBeforeDeleteCard);
+    deleteButton.addEventListener('click', () =>
+      askBeforeDeleteCard(clonedElement, clonedElement._id)
+    );
   } else {
     deleteButton.classList.add('card__delete-button-inactive');
     deleteButton.setAttribute('disabled', true);
@@ -47,66 +46,52 @@ export function createCard(object, cardElement, showImageFunction, userId) {
   return clonedElement;
 }
 
-//----------функция события окрытия попапа для удаления карточки------------
+//-----------фунция лайка--------------
 
-function askBeforeDeleteCard(evt) {
-  const deleteButton = evt.target;
-  const card = deleteButton.closest('.card');
-  openModal(popUpAskBeforeDeleteCard);
-  confirmButton.addEventListener('click', function deleteCard() {
-    confirmButton.setAttribute('disabled', true);
-    deleteCardRequest(card._id)
-      .then(() => {
-        card.remove();
-        closeModal(popUpAskBeforeDeleteCard);
-      })
-      .catch((error) => {
-        console.error(error); // Логируем ошибку
-        alert('Не удалось удалить карточку. Попробуйте снова.');
-      })
-      .finally(() => {
-        confirmButton.removeAttribute('disabled');
-      });
-  });
-}
-
-// фунция лайка
-function likeCard(evt) {
+function likeCard(evt, likeCardRequest, disLikeCardRequest) {
   const likeButton = evt.target;
   const likeContainer = likeButton.parentElement;
   const card = likeContainer.closest('.card');
-  /*(!likeButton.classList.contains('card__like-button_is-active')) ? like(card.id) : dislike(card.id)*/
-  if (!likeButton.classList.contains('card__like-button_is-active')) {
-    likeCardRequest(card._id)
-      .then((object) => {
-        const likesQuantitySpan = likeContainer.querySelector('.likesQuantity');
-        if (object.likes.length > 0) {
-          likesQuantitySpan.textContent = object.likes.length;
-        }
-        likeButton.classList.toggle('card__like-button_is-active');
-      })
-      .catch((error) => {
-        console.error(error); // Логируем ошибку
-        alert(
-          'Не удалось получить данные о количестве лайков после лайка. Попробуйте снова.'
-        );
-      });
-  } else {
-    disLikeCardRequest(card._id)
-      .then((object) => {
-        const likesQuantitySpan = likeContainer.querySelector('.likesQuantity');
-        if (object.likes.length > 0) {
-          likesQuantitySpan.textContent = object.likes.length;
-        } else {
-          likesQuantitySpan.textContent = '';
-        }
-        likeButton.classList.toggle('card__like-button_is-active');
-      })
-      .catch((error) => {
-        console.error(error); // Логируем ошибку
-        alert(
-          'Не удалось получить данные о количестве лайков после дизлайка. Попробуйте снова.'
-        );
-      });
+
+  if (!card) {
+    console.error('Карточка не найдена');
+    alert('Ошибка: карточка не найдена.');
+    return;
   }
+
+  if (!card._id) {
+    console.error('ID карточки не найден');
+    alert('Ошибка: ID карточки не найден.');
+    return;
+  }
+
+  const likesQuantitySpan = likeContainer.querySelector('.likesQuantity');
+  if (!likesQuantitySpan) {
+    console.error('Элемент для отображения количества лайков не найден');
+    return;
+  }
+
+  likeButton.disabled = true;
+
+  const isLiked = likeButton.classList.contains('card__like-button_is-active');
+  const request = isLiked
+    ? disLikeCardRequest(card._id)
+    : likeCardRequest(card._id);
+
+  request
+    .then((object) => {
+      if (object.likes.length > 0) {
+        likesQuantitySpan.textContent = object.likes.length;
+      } else {
+        likesQuantitySpan.textContent = '';
+      }
+      likeButton.classList.toggle('card__like-button_is-active');
+    })
+    .catch((error) => {
+      console.error(error);
+      alert('Не удалось изменить статус лайка. Попробуйте снова.');
+    })
+    .finally(() => {
+      likeButton.disabled = false;
+    });
 }

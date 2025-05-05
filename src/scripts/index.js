@@ -11,6 +11,9 @@ import {
   editMyProfileRequest,
   addNewCardRequest,
   changeMyAvatarRequest,
+  deleteCardRequest,
+  likeCardRequest,
+  disLikeCardRequest,
 } from './api.js';
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content;
@@ -82,6 +85,18 @@ const formEditAvatarInputList = Array.from(
 // кнопка-submit формы изменения аватара
 const formEditAvatarButtonElement =
   formEditAvatar.querySelector('.popup__button');
+// карта для удаления
+let cardToDelete = null;
+// id карты для удаления
+let cardIdToDelete = null;
+// попап подтверждения удаления
+const popUpAskBeforeDeleteCard = document.querySelector(
+  '.popup_type_ask_before_delete_card'
+);
+// кнопка попапа подтверждения удаления
+const confirmDeleteButton = popUpAskBeforeDeleteCard.querySelector(
+  '.popup__button-delete'
+);
 // массив со списком имеющихся форм
 const formList = [formEditProfile, formAddNewCard, formEditAvatar];
 // объект-конфиг
@@ -110,7 +125,15 @@ function showInformationAboutMe(object) {
 
 function pasteCards(array) {
   array.forEach((object) => {
-    const readyElement = createCard(object, cardElement, viewImage, userId._id);
+    const readyElement = createCard(
+      object,
+      cardElement,
+      viewImage,
+      userId._id,
+      askBeforeDeleteCard,
+      likeCardRequest,
+      disLikeCardRequest
+    );
     placesList.append(readyElement);
   });
 }
@@ -182,7 +205,15 @@ function waitForEventToOpenEditAvatar(popup, button) {
   });
 }
 
-//функции изменения текста кнопки при отправке запроса
+//----------функция события окрытия попапа для удаления карточки------------
+
+function askBeforeDeleteCard(card, cardId) {
+  cardToDelete = card;
+  cardIdToDelete = cardId;
+  openModal(popUpAskBeforeDeleteCard);
+}
+
+//-------функции изменения текста кнопки при отправке запроса-----------
 
 function changeTextSubmitButton(button, newText) {
   const currentButton = button;
@@ -229,7 +260,10 @@ function addNewCard(evt) {
         object,
         cardElement,
         viewImage,
-        userId._id
+        userId._id,
+        askBeforeDeleteCard,
+        likeCardRequest,
+        disLikeCardRequest
       );
       placesList.prepend(clonedNewElement);
       closeModal(popupNewCard);
@@ -264,6 +298,24 @@ function editAvatar(evt) {
     })
     .finally(() => {
       returnInitialTextSubmitButton(evt.target.lastElementChild, 'Сохранить');
+    });
+}
+
+//----------обработчик удаления карты------------
+
+function deleteCard(cardToDelete, cardIdToDelete) {
+  confirmDeleteButton.setAttribute('disabled', true);
+  deleteCardRequest(cardIdToDelete)
+    .then(() => {
+      cardToDelete.remove();
+      closeModal(popUpAskBeforeDeleteCard);
+    })
+    .catch((error) => {
+      console.error(error); // Логируем ошибку
+      alert('Не удалось удалить карточку. Попробуйте снова.');
+    })
+    .finally(() => {
+      confirmDeleteButton.removeAttribute('disabled');
     });
 }
 
@@ -305,6 +357,12 @@ waitForEventToOpenEditAvatar(popupChangeAvatar, editAvatarButton);
 //----------слушатель изменение аватара------------
 
 formEditAvatar.addEventListener('submit', editAvatar);
+
+//----------слушатель удаления карточки------------
+
+confirmDeleteButton.addEventListener('click', () =>
+  deleteCard(cardToDelete, cardIdToDelete)
+);
 
 //----------Валидация------------
 

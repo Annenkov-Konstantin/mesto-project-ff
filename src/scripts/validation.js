@@ -1,4 +1,5 @@
-// Функция, которая добаляет класс с ошибкой
+//-----------Функция, которая добаляет класс с ошибкой------------
+
 const showInputError = (formElementsClasses, form, element, errorMessage) => {
   const errorElement = form.querySelector(`.${element.id}-error`);
   //добавляем красное подчеркивание инпуту
@@ -9,7 +10,8 @@ const showInputError = (formElementsClasses, form, element, errorMessage) => {
   errorElement.classList.add(formElementsClasses.errorClass);
 };
 
-// Функция, которая удаляет класс с ошибкой
+//------------Функция, которая удаляет класс с ошибкой---------
+
 const hideInputError = (formElementsClasses, form, element) => {
   const errorElement = form.querySelector(`.${element.id}-error`);
   //убираем красное подчеркивание инпута
@@ -20,7 +22,8 @@ const hideInputError = (formElementsClasses, form, element) => {
   errorElement.textContent = '';
 };
 
-// Функция, которая проверяет валидность поля
+//----------Функция, которая проверяет валидность поля----------
+
 const isValid = (evt, formElementsClasses) => {
   const inputElement = evt.target;
   // Помечаем поле как "тронутое"
@@ -56,6 +59,7 @@ const isValid = (evt, formElementsClasses) => {
 };
 
 //----------функция очистки ошибок форм------------
+
 export function clearValidationErrors(form, formElementsClasses) {
   // Находим все поля ввода
   const inputs = form.querySelectorAll(formElementsClasses.inputSelector);
@@ -81,14 +85,16 @@ export function clearValidationErrors(form, formElementsClasses) {
   return form;
 }
 
-// Функция, которая проверяет валидность полей формы
+//--------------Функция, которая проверяет валидность полей формы--------
+
 function hasInvalidInput(inputList) {
   return inputList.some((inputElement) => {
     return !inputElement.validity.valid;
   });
 }
 
-// Функция, которая дезактивирует кнопку отправки формы
+//--------Функция, которая дезактивирует кнопку отправки формы---------
+
 export function toggleButtonState(
   inputList,
   formElementsClasses,
@@ -114,7 +120,8 @@ export function toggleButtonState(
   }
 }
 
-// Функция, которая устанавливает слушатели для всех полей формы
+//--------Функция, которая устанавливает слушатели для всех полей формы-------
+
 function setEventListenersForAllFormsElements(inputList, formElementsClasses) {
   inputList.forEach((inputElement) => {
     inputElement.addEventListener('input', (evt) =>
@@ -123,7 +130,8 @@ function setEventListenersForAllFormsElements(inputList, formElementsClasses) {
   });
 }
 
-// Функция, которая устанавливает слушатели для всех форм
+//------------Функция, которая устанавливает слушатели для всех форм--------------
+
 export function enableValidation(formElementsClasses, formList) {
   //Берём список всех форм
   formList.forEach((form) => {
