@@ -2,6 +2,9 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const webpack = require('webpack');
+const dotenv = require('dotenv');
+
 module.exports = {
   entry: { main: './src/scripts/index.js' },
   output: {
@@ -46,5 +49,9 @@ module.exports = {
     }),
     new CleanWebpackPlugin(),
     new MiniCssExtractPlugin(),
+    new webpack.DefinePlugin({
+      'process.env.API_BASE_URL': JSON.stringify(dotenv.config().parsed.API_BASE_URL),
+      'process.env.API_AUTH_TOKEN': JSON.stringify(dotenv.config().parsed.API_AUTH_TOKEN),
+    }),
   ],
 };

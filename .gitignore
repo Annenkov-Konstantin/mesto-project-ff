@@ -1,2 +1,19 @@
+# Зависимости
 node_modules/
+
+# Сборка
 dist/
+
+# Переменные окружения (секреты)
+.env
+.env.local
+.env.*.local
+
+# Логи
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS
+.DS_Store
+Thumbs.db

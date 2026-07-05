@@ -1,10 +1,10 @@
 const config = {
-  baseUrl: 'https://mesto.nomoreparties.co/v1/wff-cohort-37',
+  baseUrl: process.env.API_BASE_URL,
   headers: {
-    authorization: 'b4e853f7-0794-472e-80c0-257846ce47f0',
+    authorization: process.env.API_AUTH_TOKEN,
     'Content-Type': 'application/json',
   },
-};
+}
 
 export const getInitialCards = () => {
   return fetch(`${config.baseUrl}/cards`, {
