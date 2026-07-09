@@ -16,8 +16,7 @@
 
 ### Интерфейс сайта
 
-[🔗 Посмотреть демо](https://annenkov-konstantin.github.io/mesto-project-ff/) • [💻 Исходный код](https://github.com/Annenkov-Konstantin/mesto-project-ff)
-
+[🔗 Посмотреть демо](https://annenkov-konstantin.github.io/mesto-project-ff/)
 Интерактивное SPA на чистом JavaScript с интеграцией REST API и кастомной валидацией форм. Сайт позволяет добавлять карточки с фотографиями мест, ставить лайки, редактировать профиль и загружать аватар. Все данные синхронизируются с сервером через API.
 
 ## 📄 Функциональность
